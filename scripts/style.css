@@ -1,1 +1,79 @@
+/* Wrapper fixe à 100% largeur, sans retour à la ligne */
+.wrapper {
+  overflow-x: auto; /* Permet le scroll horizontal sur petits écrans */
+}
 
+#manga-container {
+  display: flex;
+  flex-wrap: nowrap; /* ❌ Pas de retour à la ligne */
+  gap: 1rem;
+  justify-content: center;
+  padding: 10px;
+}
+
+/* Taille réduite des cartes pour en afficher 10 côte à côte */
+.card {
+  flex: 0 0 160px; /* ✅ Taille fixe, empêche l’élargissement */
+  height: 330px;
+  border: solid #555 2px;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  background-color: #1e1e1e;
+  color: white;
+  font-family: Open Sans;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: border-color 0.4s ease, transform 0.4s;
+}
+
+.card h3 {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 5px 0;
+  height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.2;
+  word-break: break-word;
+  cursor: help;
+}
+
+.card img {
+  width: 100px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin: 10px auto;
+}
+
+.card p {
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+.card.updated {
+  animation: flash 0.6s ease;
+}
+
+@keyframes flash {
+  0%   { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* Top 3 highlight */
+.card.rank-1 {
+  border-color: gold;
+}
+.card.rank-2 {
+  border-color: silver;
+}
+.card.rank-3 {
+  border-color: #cd7f32;
+}
