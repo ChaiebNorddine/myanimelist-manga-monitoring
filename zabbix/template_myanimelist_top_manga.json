@@ -1,0 +1,482 @@
+{
+    "zabbix_export": {
+        "version": "7.0",
+        "template_groups": [
+            {
+                "uuid": "a571c0d144b14fd4a87a9d9b2aa9fcd6",
+                "name": "Templates/Applications"
+            }
+        ],
+        "templates": [
+            {
+                "uuid": "fe56bab2ec7d40f3af1d80d8a14a0174",
+                "template": "Template MyAnimeList Top Manga Monitoring",
+                "name": "Template MyAnimeList Top Manga Monitoring",
+                "description": "This is a custom Zabbix template designed to monitor real-time top manga rankings from MyAnimeList.net using the official MAL API.\n\nIt leverages the Zabbix HTTP Agent and native JSON-based Low-Level Discovery (LLD) to dynamically discover and track the top 10 manga, extracting key metadata such as title, rank, and cover image.\n\nRequirements:\nZabbix 7.0+ (for HTTP Agent custom headers support)\nA valid MyAnimeList API Client ID",
+                "groups": [
+                    {
+                        "name": "Templates/Applications"
+                    }
+                ],
+                "items": [
+                    {
+                        "uuid": "802d3de782b842fc978b4419b637da09",
+                        "name": "My Anime List Ranking",
+                        "type": "HTTP_AGENT",
+                        "key": "mal.top.manga.json",
+                        "value_type": "LOG",
+                        "trends": "0",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.data[*]"
+                                ]
+                            }
+                        ],
+                        "url": "https://api.myanimelist.net/v2/manga/ranking?ranking_type=all&limit={$TOP_LIST}",
+                        "query_fields": [
+                            {
+                                "name": "fields",
+                                "value": "title,mean,rank,popularity,media_type,status,start_date,end_date,num_list_users"
+                            }
+                        ],
+                        "headers": [
+                            {
+                                "name": "X-MAL-CLIENT-ID",
+                                "value": "{$CLIENT_ID}"
+                            }
+                        ]
+                    }
+                ],
+                "discovery_rules": [
+                    {
+                        "uuid": "d072365fd9714b3692c708cc24205bfd",
+                        "name": "MAL Top Manga discovery",
+                        "type": "HTTP_AGENT",
+                        "key": "mal.top.manga.discovery",
+                        "delay": "1h",
+                        "item_prototypes": [
+                            {
+                                "uuid": "4f56231b1759463892d3a4b9c7d95c74",
+                                "name": "Manga \"{#TITLE}\" Cover Image (Large)",
+                                "type": "DEPENDENT",
+                                "key": "manga.cover.large[{#ID}]",
+                                "delay": "0",
+                                "value_type": "CHAR",
+                                "trends": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.main_picture.large.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "a29ee6bbccc043f284f00c7970cc6863",
+                                "name": "Manga \"{#TITLE}\" Cover Image (Medium)",
+                                "type": "DEPENDENT",
+                                "key": "manga.cover.medium[{#ID}]",
+                                "delay": "0",
+                                "value_type": "CHAR",
+                                "trends": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.main_picture.medium.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "22f301d7ee73448f9a1b040e1cb65481",
+                                "name": "Manga \"{#TITLE}\" End Date",
+                                "type": "DEPENDENT",
+                                "key": "manga.end_date[{#ID}]",
+                                "delay": "0",
+                                "value_type": "CHAR",
+                                "trends": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.end_date.first()"
+                                        ],
+                                        "error_handler": "CUSTOM_VALUE",
+                                        "error_handler_params": "N/A"
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "a19c2f2bc53a402dbb9c20b33fa43211",
+                                "name": "Manga \"{#TITLE}\" ID",
+                                "type": "DEPENDENT",
+                                "key": "manga.id[{#ID}]",
+                                "delay": "0",
+                                "trends": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.id.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "c04dcdfd4d274ba8b2b0329c9cd1d8b0",
+                                "name": "Manga \"{#TITLE}\" Mean Score",
+                                "type": "DEPENDENT",
+                                "key": "manga.mean[{#ID}]",
+                                "delay": "0",
+                                "value_type": "FLOAT",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.mean.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "d1837d12ac3b4b2994e5f023cc81939e",
+                                "name": "Manga \"{#TITLE}\" Media Type",
+                                "type": "DEPENDENT",
+                                "key": "manga.media_type[{#ID}]",
+                                "delay": "0",
+                                "value_type": "CHAR",
+                                "trends": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.media_type.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "53d1059e312149faaca51d7008011d6d",
+                                "name": "Manga \"{#TITLE}\" Total Users",
+                                "type": "DEPENDENT",
+                                "key": "manga.num_list_users[{#ID}]",
+                                "delay": "0",
+                                "trends": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.num_list_users.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "10f109cbf46e406398c869560915ae27",
+                                "name": "Manga \"{#TITLE}\" Popularity",
+                                "type": "DEPENDENT",
+                                "key": "manga.popularity[{#ID}]",
+                                "delay": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.popularity.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "25a60930efb942fbb4ca213f6ca3d875",
+                                "name": "Manga \"{#TITLE}\" Rank",
+                                "type": "DEPENDENT",
+                                "key": "manga.rank[{#ID}]",
+                                "delay": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].ranking.rank.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ],
+                                "trigger_prototypes": [
+                                    {
+                                        "uuid": "86830bc4e80c41628d5395000d2858df",
+                                        "expression": "last(/Template MyAnimeList Top Manga Monitoring/manga.rank[{#ID}])=1",
+                                        "recovery_mode": "RECOVERY_EXPRESSION",
+                                        "recovery_expression": "last(/Template MyAnimeList Top Manga Monitoring/manga.rank[{#ID}])<>1",
+                                        "name": "Manga [{#TITLE}] is ranked #{#RANK}",
+                                        "url_name": "MyAnimeList",
+                                        "url": "https://myanimelist.net/manga/{#ID}",
+                                        "priority": "INFO",
+                                        "description": "This trigger is generated by LLD based on the JSON data collected from MyAnimeList (https://myanimelist.net/topmanga.php).\n\nRank #{#RANK} corresponds to the manga [{#TITLE}] .\n\nThis ranking is automatically refreshed based on the latest MyAnimeList Top 10 manga list."
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "d5a0a9fed44647d580f7038e29de1dd1",
+                                "name": "Manga \"{#TITLE}\" Start Date",
+                                "type": "DEPENDENT",
+                                "key": "manga.start_date[{#ID}]",
+                                "delay": "0",
+                                "value_type": "CHAR",
+                                "trends": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.start_date.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "a66dbba351bc4138a49ff49f1b4d3683",
+                                "name": "Manga \"{#TITLE}\" Status",
+                                "type": "DEPENDENT",
+                                "key": "manga.status[{#ID}]",
+                                "delay": "0",
+                                "value_type": "CHAR",
+                                "trends": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.status.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "dca2488b8d4744f89cd122cf5e26b7de",
+                                "name": "Manga \"{#TITLE}\" Title",
+                                "type": "DEPENDENT",
+                                "key": "manga.title[{#ID}]",
+                                "delay": "0",
+                                "value_type": "CHAR",
+                                "trends": "0",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$[?(@.node.id=={#ID})].node.title.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mal.top.manga.json"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "manga",
+                                        "value": "{#TITLE}"
+                                    },
+                                    {
+                                        "tag": "rank",
+                                        "value": "{#RANK}"
+                                    }
+                                ]
+                            }
+                        ],
+                        "url": "https://api.myanimelist.net/v2/manga/ranking?ranking_type=all&limit={$TOP_LIST}",
+                        "query_fields": [
+                            {
+                                "name": "fields",
+                                "value": "title,mean,rank,popularity,media_type,status,start_date,end_date,num_list_users"
+                            }
+                        ],
+                        "headers": [
+                            {
+                                "name": "X-MAL-CLIENT-ID",
+                                "value": "{$CLIENT_ID}"
+                            }
+                        ],
+                        "lld_macro_paths": [
+                            {
+                                "lld_macro": "{#COVER}",
+                                "path": "$.node.main_picture.large"
+                            },
+                            {
+                                "lld_macro": "{#ID}",
+                                "path": "$.node.id"
+                            },
+                            {
+                                "lld_macro": "{#RANK}",
+                                "path": "$.ranking.rank"
+                            },
+                            {
+                                "lld_macro": "{#TITLE}",
+                                "path": "$.node.title"
+                            }
+                        ],
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.data[*]"
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$CLIENT_ID}"
+                    },
+                    {
+                        "macro": "{$TOP_LIST}",
+                        "value": "10"
+                    }
+                ]
+            }
+        ]
+    }
+}
