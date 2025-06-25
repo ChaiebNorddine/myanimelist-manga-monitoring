@@ -1,19 +1,19 @@
-/* Wrapper fixe à 100% largeur, sans retour à la ligne */
+/* Wrapper set to full width with no line breaks */
 .wrapper {
-  overflow-x: auto; /* Permet le scroll horizontal sur petits écrans */
+  overflow-x: auto; /* Enables horizontal scrolling on small screens */
 }
 
 #manga-container {
   display: flex;
-  flex-wrap: nowrap; /* ❌ Pas de retour à la ligne */
+  flex-wrap: nowrap; /* ❌ Prevents wrapping of items to the next line */
   gap: 1rem;
   justify-content: center;
   padding: 10px;
 }
 
-/* Taille réduite des cartes pour en afficher 10 côte à côte */
+/* Reduced card size to fit 10 side by side */
 .card {
-  flex: 0 0 160px; /* ✅ Taille fixe, empêche l’élargissement */
+  flex: 0 0 160px; /* ✅ Fixed width, prevents growing */
   height: 330px;
   border: solid #555 2px;
   border-radius: 10px;
@@ -58,6 +58,7 @@
   margin: 4px 0;
 }
 
+/* Animation for recently updated cards */
 .card.updated {
   animation: flash 0.6s ease;
 }
@@ -67,7 +68,7 @@
   100% { transform: scale(1); }
 }
 
-/* Top 3 highlight */
+/* Highlighting top 3 ranked cards */
 .card.rank-1 {
   border-color: gold;
 }
@@ -75,5 +76,5 @@
   border-color: silver;
 }
 .card.rank-3 {
-  border-color: #cd7f32;
+  border-color: #cd7f32; /* Bronze */
 }
